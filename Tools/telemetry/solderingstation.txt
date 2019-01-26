@@ -1,0 +1,452 @@
+Telemetry Viewer File Format v0.5
+
+GUI Settings:
+
+	tile column count = 9
+	tile row count = 6
+	show plot tooltips = true
+	smooth scrolling = true
+	opengl antialiasing = true
+	show fps and period = false
+	chart index for benchmarks = -1
+
+Communication Settings:
+
+	port = UART: COM10
+	uart baud rate = 921600
+	tcp/udp port number = 8080
+	packet type = Binary
+	sample rate = 100
+
+30 Data Structure Locations:
+
+	location = 1
+	processor index = 0
+	name = Tool1 Temperature RAW
+	color = 0xFF0000
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 3
+	processor index = 0
+	name = Tool1 Temperature
+	color = 0xFF0000
+	unit = °C
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 5
+	processor index = 0
+	name = Tool1 Thermal throttle
+	color = 0xFF0000
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 7
+	processor index = 0
+	name = Tool1 Pulse
+	color = 0xFF0000
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 9
+	processor index = 0
+	name = Tool2 Temperature RAW
+	color = 0x00FF00
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 11
+	processor index = 0
+	name = Tool2 Temperature
+	color = 0x00FF00
+	unit = °C
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 13
+	processor index = 0
+	name = Tool2 Thermal throttle
+	color = 0x00FF00
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 15
+	processor index = 0
+	name = Tool2 Pulse
+	color = 0x00FF00
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 17
+	processor index = 0
+	name = Ambient temperature
+	color = 0xFF0000
+	unit = °C
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 19
+	processor index = 0
+	name = Supply voltage
+	color = 0xFF0000
+	unit = V
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 21
+	processor index = 0
+	name = MCU temperature
+	color = 0x0088FF
+	unit = °C
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 23
+	processor index = 2
+	name = RMS Power
+	color = 0x00FF00
+	unit = W
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 27
+	processor index = 2
+	name = RMS Voltage
+	color = 0x00FF00
+	unit = V
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 31
+	processor index = 2
+	name = RMS Current
+	color = 0x00FF00
+	unit = A
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 35
+	processor index = 0
+	name = Setpoint temperature
+	color = 0x33CCFF
+	unit = °C
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 37
+	processor index = 2
+	name = Max Voltage
+	color = 0xFF0066
+	unit = V
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 41
+	processor index = 2
+	name = Max Current
+	color = 0xFF0066
+	unit = A
+	conversion factor a = 1.0
+	conversion factor b = 0.001
+
+	location = 45
+	processor index = 0
+	name = Tool 1 in holder
+	color = 0x0033FF
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 47
+	processor index = 0
+	name = Tool 2 in holder
+	color = 0xCC00CC
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 49
+	processor index = 0
+	name = Toolchange
+	color = 0xFF0033
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 51
+	processor index = 0
+	name = Tool 1 ID
+	color = 0x339900
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 53
+	processor index = 0
+	name = Tool 2 ID
+	color = 0x00CCCC
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 55
+	processor index = 0
+	name = Filtered Voltage
+	color = 0x0066FF
+	unit = V
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 57
+	processor index = 0
+	name = Filtered Current
+	color = 0x0066FF
+	unit = A
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 59
+	processor index = 0
+	name = Filtered Power
+	color = 0x0066FF
+	unit = W
+	conversion factor a = 1.0
+	conversion factor b = 0.1
+
+	location = 61
+	processor index = 0
+	name = RAW Tool 1 in holder
+	color = 0xFF0099
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 63
+	processor index = 0
+	name = RAW Tool 2 in holder
+	color = 0xFFCC00
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 65
+	processor index = 0
+	name = RAW Tool change
+	color = 0xFF3333
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 67
+	processor index = 0
+	name = RAW Tool 1 ID
+	color = 0x0099CC
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+	location = 69
+	processor index = 0
+	name = RAW Tool 2 ID
+	color = 0x00CC00
+	unit = 
+	conversion factor a = 1.0
+	conversion factor b = 1.0
+
+Checksum:
+
+	location = -1
+	checksum processor index = -1
+
+11 Charts:
+
+	chart type = Time Domain Chart
+	top left x = 0
+	top left y = 4
+	bottom right x = 4
+	bottom right y = 4
+	datasets = 27,37
+	sample count = 2000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0.0
+	autoscale y-axis maximum = true
+	manual y-axis maximum = 1.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 0
+	top left y = 5
+	bottom right x = 4
+	bottom right y = 5
+	datasets = 31,41
+	sample count = 2000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0.0
+	autoscale y-axis maximum = true
+	manual y-axis maximum = 1.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 5
+	top left y = 0
+	bottom right x = 6
+	bottom right y = 1
+	datasets = 17,21
+	sample count = 1000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0.0
+	autoscale y-axis maximum = false
+	manual y-axis maximum = 70.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 7
+	top left y = 0
+	bottom right x = 8
+	bottom right y = 1
+	datasets = 19
+	sample count = 1000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 2.5
+	autoscale y-axis maximum = false
+	manual y-axis maximum = 3.6
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 5
+	top left y = 2
+	bottom right x = 6
+	bottom right y = 3
+	datasets = 7,15
+	sample count = 2000
+	autoscale y-axis minimum = true
+	manual y-axis minimum = -1.0
+	autoscale y-axis maximum = true
+	manual y-axis maximum = 1.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Dial Chart
+	top left x = 5
+	top left y = 4
+	bottom right x = 6
+	bottom right y = 5
+	datasets = 5
+	sample count = 1000
+	autoscale minimum = false
+	manual minimum = 0.0
+	autoscale maximum = false
+	manual maximum = 8000.0
+	show reading label = true
+	show dataset label = true
+	show min max labels = true
+	show statistics = true
+
+	chart type = Dial Chart
+	top left x = 7
+	top left y = 4
+	bottom right x = 8
+	bottom right y = 5
+	datasets = 13
+	sample count = 1000
+	autoscale minimum = false
+	manual minimum = 0.0
+	autoscale maximum = false
+	manual maximum = 8000.0
+	show reading label = true
+	show dataset label = true
+	show min max labels = true
+	show statistics = true
+
+	chart type = Dial Chart
+	top left x = 7
+	top left y = 2
+	bottom right x = 8
+	bottom right y = 3
+	datasets = 23
+	sample count = 1000
+	autoscale minimum = false
+	manual minimum = 0.0
+	autoscale maximum = false
+	manual maximum = 200.0
+	show reading label = true
+	show dataset label = true
+	show min max labels = true
+	show statistics = true
+
+	chart type = Time Domain Chart
+	top left x = 0
+	top left y = 0
+	bottom right x = 4
+	bottom right y = 1
+	datasets = 3,11,35
+	sample count = 2000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0.0
+	autoscale y-axis maximum = true
+	manual y-axis maximum = 1.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 0
+	top left y = 2
+	bottom right x = 4
+	bottom right y = 2
+	datasets = 45,47,49,51,53
+	sample count = 2000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0.0
+	autoscale y-axis maximum = false
+	manual y-axis maximum = 2.0
+	show x-axis title = false
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true
+
+	chart type = Time Domain Chart
+	top left x = 0
+	top left y = 3
+	bottom right x = 4
+	bottom right y = 3
+	datasets = 61,63,65,67,69
+	sample count = 2000
+	autoscale y-axis minimum = false
+	manual y-axis minimum = 0
+	autoscale y-axis maximum = false
+	manual y-axis maximum = 4095
+	show x-axis title = true
+	show x-axis scale = true
+	show y-axis title = true
+	show y-axis scale = true
+	show legend = true

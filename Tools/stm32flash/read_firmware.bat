@@ -1,0 +1,1 @@
+stm32flash -roldfirmware.bin COM4
