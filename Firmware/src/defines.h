@@ -31,6 +31,7 @@
 
 // Build configurations
 //#define THIN_BUILD												// Decreased flash requirements
+//#define AD8226
 
 // Debug
 #define USARTDEBUG                     		                	// Enable messages via serial
@@ -44,12 +45,15 @@
 #define INPUT_HIGH						3000					// Signal considered OFF above this value
 
 // Calibration points
-//#define CALIB_T245						650, 800, 1300			// Calibration ADC values (above reference offset) for calibrating C245
-//#define CALIB_T210						(180 + OFFSET_T210), (250 + OFFSET_T210), (340 + OFFSET_T210)
-//																// Calibration ADC values (above reference offset) for calibrating C210
+#ifdef AD8226
+#define CALIB_T245						650, 800, 1300			// Calibration ADC values (above reference offset) for calibrating C245
+#define CALIB_T210						(180 + OFFSET_T210), (250 + OFFSET_T210), (340 + OFFSET_T210)
+																// Calibration ADC values (above reference offset) for calibrating C210
+#else
 #define CALIB_T245						1300, 1800, 2500			// Calibration ADC values (above reference offset) for calibrating C245
 #define CALIB_T210						(360 + OFFSET_T210), (500 + OFFSET_T210), (680 + OFFSET_T210)
 																// Calibration ADC values (above reference offset) for calibrating C210
+#endif
 
 // Temperature limits
 #define TEMP_ZERO						320						// in 0.1 °F   (0 °C)
@@ -84,9 +88,14 @@
 #define POWER_OVERLIMIT					10					// Watts
 
 // Input offset compensation
+#ifdef AD8226
 // AD8226 (470 Ohm, gain resistance)
+#define OFFSET_T245						11						// Bypassing digital input current offset on temperature measurement
+#define OFFSET_T210						72						// Bypassing digital input current offset on temperature measurement
+#else
 #define OFFSET_T245						31						// Bypassing digital input current offset on temperature measurement
 #define OFFSET_T210						172						// Bypassing digital input current offset on temperature measurement
+#endif
 
 // Timers
 #define TIME_FORGOTTEN					(6*60)					// minutes, Warning time system is on (play melody)

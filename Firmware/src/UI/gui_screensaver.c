@@ -36,6 +36,7 @@ static void _screenSaverTimerCallback(TimerHandle_t xTimer)
 {
 	_u8ScreenOn = 0;
 	gdispSetBacklight(0);
+	soundEvent();
 }
 
 void guiScreenSaverInit(void)
@@ -50,16 +51,22 @@ void guiSetScreenSaver(uint16_t time)
 	xTimerChangePeriod(_thScreenSaver, ((uint32_t)time * 60 * 1000) / portTICK_PERIOD_MS, portMAX_DELAY);
 }
 
+void guiWakeUpScreen(void)
+{
+	xTimerReset(_thScreenSaver, portMAX_DELAY);
+	if (!_u8ScreenOn) {
+		_u8ScreenOn = 1;
+		gdispSetBacklight(100);
+		soundNotice();
+	}
+}
+
 StationEvent_t guiGetStationEvent(void)
 {
 	StationEvent_t event = uiGetStationEvent();
 
 	if (event != SE_NONE) {
-		xTimerReset(_thScreenSaver, portMAX_DELAY);
-		if (!_u8ScreenOn) {
-			_u8ScreenOn = 1;
-			gdispSetBacklight(100);
-		}
+		guiWakeUpScreen();
 	}
 
 	return event;

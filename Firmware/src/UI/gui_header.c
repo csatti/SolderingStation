@@ -188,6 +188,8 @@ static void _convertRailVal(uint16_t val, char* str, const char* unit)
 static void _headerUpdateTask(void *pvParameters)
 {
 	uint8_t tempUpdate = 0;
+	ToolState_t tool1State, tool2State;
+	InputState_t tool1Holder, tool2Holder;
 
 	vTaskDelay(HEADER_UPDATE_START_DELAY);
 
@@ -195,6 +197,7 @@ static void _headerUpdateTask(void *pvParameters)
 		ConfigOnline_t* ConfigOnline = configGetConfigOnline();
 		DataExchange_t* DataExchange = controlGetDataExchange();
 		uint32_t icons = 0;
+		uint8_t wakeUp = 0;
 
 		uint16_t ambitemp = guiInternalToDisplay(
 				DataExchange->state.ambientTempInt);
@@ -231,6 +234,26 @@ static void _headerUpdateTask(void *pvParameters)
 		throttle2 = DataExchange->state.tool2.thermalThrottle;
 		refRaw = DataExchange->state.refVoltageRaw;
 		supply = DataExchange->state.supplyVoltage;
+
+		if (tool1State != DataExchange->state.tool1.toolState) {
+			tool1State = DataExchange->state.tool1.toolState;
+			if ((tool1State == TOOL_WARMUP) || (tool1State == TOOL_READY)) wakeUp = 1;
+		}
+
+		if (tool1Holder != DataExchange->state.tool1.holder) {
+			tool1Holder = DataExchange->state.tool1.holder;
+			if (tool1Holder == INPUT_OFF) wakeUp = 1;
+		}
+
+		if (tool2State != DataExchange->state.tool2.toolState) {
+			tool2State = DataExchange->state.tool2.toolState;
+			if ((tool2State == TOOL_WARMUP) || (tool2State == TOOL_READY)) wakeUp = 1;
+		}
+
+		if (tool2Holder != DataExchange->state.tool2.holder) {
+			tool2Holder = DataExchange->state.tool2.holder;
+			if (tool2Holder == INPUT_OFF) wakeUp = 1;
+		}
 
 		controlReturnDataExchange();
 
@@ -269,6 +292,8 @@ static void _headerUpdateTask(void *pvParameters)
 		gwinSetText(ghTip2IntValLabel, _szTip2Int, FALSE);
 		gwinSetText(ghRefRawValLabel, _szRefRaw, FALSE);
 		gwinSetText(ghSupplyValLabel, _szSupply, FALSE);
+
+		if (wakeUp) guiWakeUpScreen();
 
 		vTaskDelay(HEADER_UPDATE_CYCLE);
 		tempUpdate++;

@@ -31,8 +31,9 @@
 
 #include "board.h"
 
-#define soundMessage()	soundBeep(1400, 400)
-#define soundNotice()	soundBeep(800, 150)
+#define soundMessage()	soundBeep(1400, 300); soundBeep(1400, 300)
+#define soundNotice()	soundBeep(600, 150); soundBeep(0, 100); soundBeep(800, 250)
+#define soundEvent()	soundBeep(600, 150); soundBeep(0, 100); soundBeep(400, 250)
 
 void soundInit(void);
 void soundBeep(uint16_t freq, uint16_t time);

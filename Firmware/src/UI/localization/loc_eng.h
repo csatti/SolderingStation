@@ -49,7 +49,7 @@
 #define ENG_TEXT00010 "ADC temperature:"
 #define ENG_TEXT00011 "ADC TC reference:"
 #define ENG_TEXT00012 "Supply voltage:"
-#define ENG_TEXT00013 "Connect the USB cable and install the new firmware"
+#define ENG_TEXT00013 "Connect the USB cable and install the new firmware. Good Luck!"
 #define ENG_TEXT00014 "Temperature .1F:"
 
 // Tool states
@@ -102,6 +102,7 @@
 #define ENG_TEXT00311 "Restart"
 #define ENG_TEXT00312 "Report"
 #define ENG_TEXT00313 "Scope"
+#define ENG_TEXT00314 "Default settings"
 
 // Alarms, warnings and notifications and their descriptions
 #define ENG_TEXT02001 "Alarm!"
@@ -133,6 +134,8 @@
 #define ENG_TEXT02122 "Disable telemetry"
 #define ENG_TEXT02131 "User settings are lost!"
 #define ENG_TEXT02132 "Updated from incompatible SW version"
+#define ENG_TEXT02141 "Default settings"
+#define ENG_TEXT02142 "The user settings have been reset to their default values"
 
 // Dialogs
 #define ENG_TEXT05011 "No iron detected!"

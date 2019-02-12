@@ -95,6 +95,7 @@ static const char* _getSystemMenuText(uint16_t pos)
 	case 4: return GT(MENUITEM_RESTART);
 	case 5: return GT(MENUITEM_REPORT);
 	case 6: return GT(MENUITEM_SCOPE);
+	case 7: return GT(MENUITEM_DEFAULTSETTINGS);
 	}
 
 	return GT(TEXT_EMPTY);
@@ -105,7 +106,7 @@ Menu_t guiMenuSystemMenuScreen(void)
 {
 	uint16_t selected = 0, topPos = 0;
 	ConfigOnline_t* ConfigOnline;
-	const uint16_t total = 7;
+	const uint16_t total = 8;
 
 	guiSetFooterButtons(gstudioGetFont(General), GT(MENUCONTROL_BACK),
 			GT(TEXT_EMPTY), GT(MENUCONTROL_SELECT));
@@ -172,6 +173,10 @@ Menu_t guiMenuSystemMenuScreen(void)
 					break;
 				case 6:
 					return SCOPE_SCREEN;
+				case 7:
+					configReset();
+					guiShowNotify(INFO_SETTINGSRESET);
+					break;
 				default:
 					;
 				}

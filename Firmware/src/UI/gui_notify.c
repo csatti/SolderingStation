@@ -193,6 +193,8 @@ void guiShowNotify(uint32_t message)
 			case INFO_CALIBRATIONDONE:
 				_setNotifyText(INFOTEXT_CALIBRATIONDONE);
 				break;
+			case INFO_SETTINGSRESET:
+				_setNotifyText(INFOTEXT_SETTINGSRESET);
 			default:
 				;
 			}

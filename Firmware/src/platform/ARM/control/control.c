@@ -432,7 +432,7 @@ static uint8_t _calibration(void)
 
 			// Simple pulsing control, if target is above current ADC value, heat for one cycle
 			if (target > _internalData.state.tool1.toolTempRaw)
-				_u16HeatPulses1 = 1;
+				_u16HeatPulses1 = 2;
 
 			// Signal that calibration mode is selected
 			return 1;
@@ -850,10 +850,19 @@ void controlReturnDataExchange(void)
 static void _sleepTimerCallback(TimerHandle_t xTimer)
 {
 	uint32_t id = (uint32_t)pvTimerGetTimerID(xTimer);
-
 	switch (id) {
-		case 1: _internalData.control.tool1 = 0; break;
-		case 2: _internalData.control.tool2 = 0; break;
+		case 1:
+			if (_internalData.control.tool1) {
+				_internalData.control.tool1 = 0;
+				soundEvent();
+			}
+			break;
+		case 2:
+			if (_internalData.control.tool2) {
+				_internalData.control.tool2 = 0;
+				soundEvent();
+			}
+			break;
 		default:;
 	}
 

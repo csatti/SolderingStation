@@ -71,7 +71,7 @@ bool_t guiCreateStartScreen(void)
 	wi.customDraw = 0;
 	wi.customParam = 0;
 	wi.customStyle = 0;
-	ghStartPicture = simpleimageCreate(0, &wi, &IMG_PLACEHOLDER_PNG);
+	ghStartPicture = simpleimageCreate(0, &wi, &IMG_SPLASH_PNG);
 
 	// ghStartName
 	wi.g.show = TRUE;
@@ -162,7 +162,7 @@ bool_t guiCreateUpdateScreen(void)
 	wi.customDraw = 0;
 	wi.customParam = 0;
 	wi.customStyle = 0;
-	ghUpdatePicture = simpleimageCreate(0, &wi, &IMG_PLACEHOLDER_PNG);
+	ghUpdatePicture = simpleimageCreate(0, &wi, &IMG_USB_PNG);
 
 	// ghUpdateText
 	wi.g.show = TRUE;

@@ -119,6 +119,7 @@ typedef struct  {
 
 void configInit(void);
 void configLoad(void);
+void configReset(void);
 uint8_t configIsLoaded(void);
 
 // Access to online configuration (battery backed up)

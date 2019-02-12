@@ -1,3 +1,3 @@
 /* THIS IS A GENERATED FILE, DO NOT EDIT IT! */  
-#define VERSION_SHORT 	"v0.7.5" 
-#define VERSION 		"v0.7.5-0-g96e61de-master-20190121-1903" 
+#define VERSION_SHORT 	"v0.7.6" 
+#define VERSION 		"v0.7.6-1-g44c4a47-master-20190212-2148" 

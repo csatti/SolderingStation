@@ -112,6 +112,7 @@ static const text FTXT texts[LAST_TEXT] =
 	TXT_EL(TEXT00311),
 	TXT_EL(TEXT00312),
 	TXT_EL(TEXT00313),
+	TXT_EL(TEXT00314),
 
 // Alarms, warnings and notifications and their descriptions
 	TXT_EL(TEXT02001),
@@ -143,6 +144,8 @@ static const text FTXT texts[LAST_TEXT] =
 	TXT_EL(TEXT02122),
 	TXT_EL(TEXT02131),
 	TXT_EL(TEXT02132),
+	TXT_EL(TEXT02141),
+	TXT_EL(TEXT02142),
 
 // Dialogs
 	TXT_EL(TEXT05011),

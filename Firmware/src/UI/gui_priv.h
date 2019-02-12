@@ -223,6 +223,7 @@ bool_t guiCreateUpdateScreen(void);
 // Screen saver
 void guiScreenSaverInit(void);
 void guiSetScreenSaver(uint16_t time);
+void guiWakeUpScreen(void);
 StationEvent_t guiGetStationEvent(void);
 
 #endif /* UI_GUI_PRIV_H_ */

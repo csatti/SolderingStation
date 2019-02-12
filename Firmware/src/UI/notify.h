@@ -46,6 +46,7 @@ typedef enum {
 	WARNING_SETTINGSLOST,
 	INFO_CALIBRATION,
 	INFO_CALIBRATIONDONE,
+	INFO_SETTINGSRESET,
 } NotifyCodes_t;
 
 void notifyInit(void);

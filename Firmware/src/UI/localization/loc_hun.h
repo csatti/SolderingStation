@@ -49,7 +49,7 @@
 #define HUN_TEXT00010 "ADC hőmérséklet:"
 #define HUN_TEXT00011 "ADC TE referencia:"
 #define HUN_TEXT00012 "Táp feszültség:"
-#define HUN_TEXT00013 "Csatlakoztasd az USB kábelt és telepítsd az új firmware-t"
+#define HUN_TEXT00013 "Csatlakoztasd az USB kábelt és telepítsd az új firmware-t. Good Luck!"
 #define HUN_TEXT00014 "Hőmérséklet .1F:"
 
 // Tool states
@@ -102,6 +102,7 @@
 #define HUN_TEXT00311 "Újraindítás"
 #define HUN_TEXT00312 "Jelentés"
 #define HUN_TEXT00313 "Oszcilloszkóp"
+#define HUN_TEXT00314 "Alapértelmezett beállítások"
 
 // Alarms, warnings and notifications and their descriptions
 #define HUN_TEXT02001 "Hiba!"
@@ -133,6 +134,8 @@
 #define HUN_TEXT02122 "Kapcsold ki a telemetriai adatok küldését"
 #define HUN_TEXT02131 "Elvesztek a beállítások!"
 #define HUN_TEXT02132 "Inkompatibilis szoftververzióról lett frissítve"
+#define HUN_TEXT02141 "Beállítások visszaállítva"
+#define HUN_TEXT02142 "A felhasználói beállítások az alapértelmezett értékekre visszaállítva"
 
 // Dialogs
 #define HUN_TEXT05011 "Nem érzékelhető páka!"

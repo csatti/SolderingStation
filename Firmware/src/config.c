@@ -143,6 +143,58 @@ void configInit(void)
 	vQueueAddToRegistry(_shMutexCalibOffline, TXT("CalOffMx"));
 }
 
+static void _resetConfigOnline(void)
+{
+	configOnline->presetTemp1 = 4640;	// 240 °C, 464 °F
+	configOnline->presetTemp2 = 5720;	// 300 °C, 572 °F
+	configOnline->presetTemp3 = 6620;	// 350 °C, 662 °F
+	configOnline->setpointTemp = 4640;	// 240 °C, 464 °F
+	configOnline->language = 0;
+	configOnline->sound = 1;
+	configOnline->tempUnitC = 1;
+	configOnline->telemetry = 0;
+	configOnline->diagnostics = 0;
+	configOnline->loadBootloader = 0;
+	configOnline->canary = CONFIGONLINE_CANARY;
+}
+
+static void _resetConfigOffline(void)
+{
+	configOffline.sleepTemp = SleepTempTable[2];
+	configOffline.delayOff = DelayOffTable[4];
+	configOffline.tempStep = TempStepTable[3];
+	configOffline.maxTemp = MaxTempTable[1];
+	configOffline.screenOff = ScreenOffTable[3];
+	configOffline.powerLimit = PowerLimitTable[6];
+	configOffline.canary = CONFIGOFFLINE_CANARY;
+	configStoreConfigOffline();
+}
+
+static void _resetCalibOffline(void)
+{
+	memcpy(&calibOffline.gammaCurve, &ILI9341_defaultGammaCurve, sizeof(ILI9341_GammaCurve_t));
+	calibOffline.timings.offsetLowVoltageSwitchOff = 3300;
+	calibOffline.timings.offsetMosfetSwitchStart = 380;
+	calibOffline.timings.offsetZeroCross = 570;
+	calibOffline.toolT210.calibrated = 0;
+	calibOffline.toolT210.calibrationPointTemp[0] = 4640;
+	calibOffline.toolT210.calibrationPointTemp[1] = 5720;
+	calibOffline.toolT210.calibrationPointTemp[2] = 6620;
+	calibOffline.toolT245.calibrated = 0;
+	calibOffline.toolT245.calibrationPointTemp[0] = 4640;
+	calibOffline.toolT245.calibrationPointTemp[1] = 5720;
+	calibOffline.toolT245.calibrationPointTemp[2] = 6620;
+
+	calibOffline.canary = CALIBOFFLINE_CANARY;
+	configStoreCalibOffline();
+}
+
+void configReset(void)
+{
+	_resetConfigOnline();
+	_resetConfigOffline();
+}
+
 void configLoad(void)
 {
 	eepromReadBlock(CONFIGOFFSET, (uint8_t*)&configOffline, sizeof(ConfigOffline_t));
@@ -150,48 +202,17 @@ void configLoad(void)
 
 	if (configOnline->canary != CONFIGONLINE_CANARY) {
 		notifySend(WARNING_BATTERY);
-		configOnline->presetTemp1 = 4640;	// 240 °C, 464 °F
-		configOnline->presetTemp2 = 5720;	// 300 °C, 572 °F
-		configOnline->presetTemp3 = 6620;	// 350 °C, 662 °F
-		configOnline->setpointTemp = 4640;	// 240 °C, 464 °F
-		configOnline->language = 0;
-		configOnline->sound = 1;
-		configOnline->tempUnitC = 1;
-		configOnline->telemetry = 0;
-		configOnline->diagnostics = 0;
-		configOnline->loadBootloader = 0;
-		configOnline->canary = CONFIGONLINE_CANARY;
+		_resetConfigOnline();
 	}
 
 	if (configOffline.canary != CONFIGOFFLINE_CANARY) {
 		notifySend(WARNING_SETTINGSLOST);
-		configOffline.sleepTemp = SleepTempTable[2];
-		configOffline.delayOff = DelayOffTable[4];
-		configOffline.tempStep = TempStepTable[3];
-		configOffline.maxTemp = MaxTempTable[1];
-		configOffline.screenOff = ScreenOffTable[3];
-		configOffline.powerLimit = PowerLimitTable[6];
-		configOffline.canary = CONFIGOFFLINE_CANARY;
-		configStoreConfigOffline();
+		_resetConfigOffline();
 	}
 
 	if (calibOffline.canary != CALIBOFFLINE_CANARY) {
 		notifySend(ALARM_CALIBRATION);
-		memcpy(&calibOffline.gammaCurve, &ILI9341_defaultGammaCurve, sizeof(ILI9341_GammaCurve_t));
-		calibOffline.timings.offsetLowVoltageSwitchOff = 3300;
-		calibOffline.timings.offsetMosfetSwitchStart = 380;
-		calibOffline.timings.offsetZeroCross = 570;
-		calibOffline.toolT210.calibrated = 0;
-		calibOffline.toolT210.calibrationPointTemp[0] = 4640;
-		calibOffline.toolT210.calibrationPointTemp[1] = 5720;
-		calibOffline.toolT210.calibrationPointTemp[2] = 6620;
-		calibOffline.toolT245.calibrated = 0;
-		calibOffline.toolT245.calibrationPointTemp[0] = 4640;
-		calibOffline.toolT245.calibrationPointTemp[1] = 5720;
-		calibOffline.toolT245.calibrationPointTemp[2] = 6620;
-
-		calibOffline.canary = CALIBOFFLINE_CANARY;
-		configStoreCalibOffline();
+		_resetCalibOffline();
 	}
 
 	configLoaded = 1;

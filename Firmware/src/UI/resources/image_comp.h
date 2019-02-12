@@ -40,12 +40,14 @@
 #include "arch.h"
 #include "image_common.h"
 
-extern const ImageDesc_t IMG_PLACEHOLDER_PNG;
+extern const ImageDesc_t IMG_SPLASH_PNG;
+extern const ImageDesc_t IMG_USB_PNG;
 
 /* Image list
- * IMG_PLACEHOLDER_PNG  128 x   96 : 410 bytes
- * ---------------------------------------------
- * Total                           : 410 bytes
+ * IMG_SPLASH_PNG  128 x   96 : 16797 bytes
+ * IMG_USB_PNG     128 x   96 :  9070 bytes
+ * ----------------------------------------
+ * Total                      : 25867 bytes
  */
 
 #endif /* IMAGE_COMP_H */
