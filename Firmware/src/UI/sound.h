@@ -34,6 +34,7 @@
 #define soundMessage()	soundBeep(1400, 300); soundBeep(1400, 300)
 #define soundNotice()	soundBeep(600, 150); soundBeep(0, 100); soundBeep(800, 250)
 #define soundEvent()	soundBeep(600, 150); soundBeep(0, 100); soundBeep(400, 250)
+#define soundWarn()		soundBeep(500, 150); soundBeep(0, 100); soundBeep(500, 150); soundBeep(0, 100); soundBeep(300, 150)
 
 void soundInit(void);
 void soundBeep(uint16_t freq, uint16_t time);

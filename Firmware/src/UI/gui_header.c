@@ -49,6 +49,8 @@ static char _szTip2Int[10];
 static char _szRefRaw[10];
 static char _szSupply[10];
 
+static TimerHandle_t _thWarnOff;
+
 bool_t guiCreateHeaderAndFooter(void)
 {
 	GWidgetInit wi;
@@ -78,9 +80,9 @@ bool_t guiCreateHeaderAndFooter(void)
 	wi.customParam = 0;
 	ghToolLeft = toolstatusCreate(0, &wi, TOOL_LEFT);
 	gwinSetFont(ghToolLeft, gstudioGetFont(General));
-	toolstatusSetState(ghToolLeft, TOOL_SLEEP);
-	toolstatusSetTemp(ghToolLeft, 189U);
-	toolstatusSetType(ghToolLeft, TOOL_T245);
+	toolstatusSetState(ghToolLeft, TOOL_SETUP);
+	toolstatusSetTemp(ghToolLeft, 0U);
+	toolstatusSetType(ghToolLeft, TOOL_NOTYPE);
 
 	// ghToolRight
 	wi.g.show = TRUE;
@@ -91,9 +93,9 @@ bool_t guiCreateHeaderAndFooter(void)
 	wi.customParam = 0;
 	ghToolRight = toolstatusCreate(0, &wi, TOOL_RIGHT);
 	gwinSetFont(ghToolRight, gstudioGetFont(General));
-	toolstatusSetState(ghToolRight, TOOL_READY);
-	toolstatusSetTemp(ghToolRight, 322U);
-	toolstatusSetType(ghToolRight, TOOL_T245);
+	toolstatusSetState(ghToolRight, TOOL_SETUP);
+	toolstatusSetTemp(ghToolRight, 0U);
+	toolstatusSetType(ghToolRight, TOOL_NOTYPE);
 
 	// ghStatusBar
 	wi.g.show = TRUE;
@@ -184,6 +186,24 @@ static void _convertRailVal(uint16_t val, char* str, const char* unit)
 	strcat(str, unit);
 }
 
+static void _startWarnTimer(void)
+{
+	xTimerReset(_thWarnOff, portMAX_DELAY);
+	xTimerStart(_thWarnOff, portMAX_DELAY);
+}
+
+static void _stopWarnTimer(void)
+{
+	xTimerStop(_thWarnOff, portMAX_DELAY);
+}
+
+
+// Screen saver timer callback
+static void _warnTimerCallback(TimerHandle_t xTimer)
+{
+	soundWarn();
+}
+
 // This task updates the header state
 static void _headerUpdateTask(void *pvParameters)
 {
@@ -242,7 +262,12 @@ static void _headerUpdateTask(void *pvParameters)
 
 		if (tool1Holder != DataExchange->state.tool1.holder) {
 			tool1Holder = DataExchange->state.tool1.holder;
-			if (tool1Holder == INPUT_OFF) wakeUp = 1;
+			if (tool1Holder == INPUT_OFF) {
+				wakeUp = 1;
+				if ((tool1State == TOOL_OFF) || (tool1State == TOOL_COOLDOWN)) _startWarnTimer();
+			} else {
+				_stopWarnTimer();
+			}
 		}
 
 		if (tool2State != DataExchange->state.tool2.toolState) {
@@ -252,7 +277,12 @@ static void _headerUpdateTask(void *pvParameters)
 
 		if (tool2Holder != DataExchange->state.tool2.holder) {
 			tool2Holder = DataExchange->state.tool2.holder;
-			if (tool2Holder == INPUT_OFF) wakeUp = 1;
+			if (tool2Holder == INPUT_OFF) {
+				wakeUp = 1;
+				if ((tool2State == TOOL_OFF) || (tool2State == TOOL_COOLDOWN)) _startWarnTimer();
+			} else {
+				_stopWarnTimer();
+			}
 		}
 
 		controlReturnDataExchange();
@@ -308,4 +338,6 @@ void guiHeaderInit(void)
 		NULL,
 		mainQUEUE_HEADER_UPDATE_TASK_PRIORITY,
 		NULL);;
+	_thWarnOff = xTimerCreate( TXT("WarnTimer"), 1000 / portTICK_PERIOD_MS,
+				pdFALSE, (void *) 0, _warnTimerCallback);
 }

@@ -94,15 +94,15 @@ static const uint16_t MaxTempTable[] = { 5720, 6620, 7520, 8420};   // in 0.1 °F
 //										 300,  350,  400,  450		°C
 
 typedef enum {
-	TEMP_UNIT,
 	SLEEP_TEMPERATURE,
-	DELAY_SWITCHOFF,
-	TEMPERATURE_STEP,
 	MAX_TEMP,
-	POWER_LIMIT,
+	TEMPERATURE_STEP,
+	DELAY_SWITCHOFF,
 	DELAY_SCREENOFF,
+	POWER_LIMIT,
 	TELEMETRY,
 	DIAGNOSTICS,
+	TEMP_UNIT,
 	// Constant for number of configuration settings
 	LAST_CONFIG
 } Configs_t;

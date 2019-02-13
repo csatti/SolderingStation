@@ -160,7 +160,7 @@ Menu_t guiMenuSystemMenuScreen(void)
 					ConfigOnline->loadBootloader = 1;
 					configReturnConfigOnline();
 					guiShowPage(FIRMWARESCREEN);
-					vTaskDelay(SPLASH_WAIT);
+					vTaskDelay(FIRMWARE_WAIT);
 					boardReset();
 					return MENU_SCREEN;
 				case 4:

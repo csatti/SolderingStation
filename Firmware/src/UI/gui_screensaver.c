@@ -57,7 +57,7 @@ void guiWakeUpScreen(void)
 	if (!_u8ScreenOn) {
 		_u8ScreenOn = 1;
 		gdispSetBacklight(100);
-		soundNotice();
+		//soundNotice();
 	}
 }
 

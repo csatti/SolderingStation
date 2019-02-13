@@ -68,6 +68,7 @@
 #define HEADER_UPDATE_CYCLE								pdMS_TO_TICKS(75)
 #define HEADER_UPDATE_START_DELAY						pdMS_TO_TICKS(400)
 #define SPLASH_WAIT										pdMS_TO_TICKS(2500)
+#define FIRMWARE_WAIT									pdMS_TO_TICKS(10000)
 #define INIT_WAIT										pdMS_TO_TICKS(200)
 
 typedef enum guiPage {
