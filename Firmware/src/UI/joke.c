@@ -29,6 +29,9 @@
 #include "joke.h"
 #include "sound.h"
 
+// Original source code from: http://processors.wiki.ti.com/index.php/Playing_The_Imperial_March
+// Original author's copyright notice is not retrievable (link is dead)
+
 #define c 261
 #define d 294
 #define e 329

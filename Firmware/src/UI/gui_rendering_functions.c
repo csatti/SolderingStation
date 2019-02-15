@@ -1,3 +1,10 @@
+/*
+ * This file is subject to the terms of the GFX License. If a copy of
+ * the license was not distributed with this file, you can obtain one at:
+ *
+ *              http://ugfx.com/license.html
+ */
+
 #include "gui_priv.h"
 #include "lzg.h"
 
@@ -21,7 +28,6 @@ static coord_t getheight(const char *text, font_t font, coord_t maxwidth) {
 // macros to assist in data type conversions
 #define gh2obj					((GLabelObject *)gh)
 #define gw2obj					((GLabelObject *)gw)
-
 
 static void gwinLabelDrawPM(GWidgetObject *gw, justify_t justify) {
 	coord_t				w, h;

@@ -44,6 +44,7 @@
 #define timingInit()					((void) 0)
 #define boardLoadBootloader()			((void) 0)
 #define boardReset()					((void) 0)
+#define __NOP()							asm volatile("nop")
 
 typedef enum {
 	AMBIENT_TEMP = 0,

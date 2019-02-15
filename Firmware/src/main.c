@@ -36,9 +36,6 @@
 #include "notify.h"
 
 #define mainQUEUE_MONITORINGREPORT_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
-
-/* The rate at which data is sent to the queue, specified in milliseconds, and
- converted to ticks using the pdMS_TO_TICKS() macro. */
 #define mainQUEUE_MONITORINGREPORT_PERIOD_MS            pdMS_TO_TICKS( 2000 )
 
 static void prvSetupHardware(void);
@@ -64,8 +61,11 @@ void static _checkFirmwareUpdateRequest(void)
 
 }
 
-/*-----------------------------------------------------------*/
 
+/* Application start point
+   Checks if firmware update was requested
+   Runs initialization routines
+   Starts RTOS scheduler */
 int main(void) {
 
 	_checkFirmwareUpdateRequest();
@@ -85,13 +85,7 @@ int main(void) {
 	/* Start the tasks and timer running. */
 	vTaskStartScheduler();
 
-	/* If all is well, the scheduler will now be running, and the following line
-	 will never be reached.  If the following line does execute, then there was
-	 insufficient FreeRTOS heap memory available for the idle and/or timer tasks
-	 to be created.  See the memory management section on the FreeRTOS web site
-	 for more details.  */
-	for (;;)
-		;
+	while (1) { __NOP(); }
 }
 
 /*-----------------------------------------------------------*/
@@ -131,16 +125,8 @@ void vApplicationTickHook(void) {
 /*-----------------------------------------------------------*/
 
 void vApplicationMallocFailedHook(void) {
-	/* The malloc failed hook is enabled by setting
-	 configUSE_MALLOC_FAILED_HOOK to 1 in FreeRTOSConfig.h.
 
-	 Called if a call to pvPortMalloc() fails because there is insufficient
-	 free memory available in the FreeRTOS heap.  pvPortMalloc() is called
-	 internally by FreeRTOS API functions that create tasks, queues, software
-	 timers, and semaphores.  The size of the FreeRTOS heap is set by the
-	 configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
-	for (;;)
-		;
+	while (1) { __NOP(); }
 }
 /*-----------------------------------------------------------*/
 
@@ -148,42 +134,19 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName) 
 	(void) pcTaskName;
 	(void) xTask;
 
-	/* Run time stack overflow checking is performed if
-	 configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
-	 function is called if a stack overflow is detected.  pxCurrentTCB can be
-	 inspected in the debugger if the task name passed into this function is
-	 corrupt. */
-	for (;;)
-		;
+	while (1) { __NOP(); }
 }
 /*-----------------------------------------------------------*/
 
 void vApplicationIdleHook(void) {
-	volatile size_t xFreeStackSpace;
 
-	/* The idle task hook is enabled by setting configUSE_IDLE_HOOK to 1 in
-	 FreeRTOSConfig.h.
-
-	 This function is called on each cycle of the idle task.  In this case it
-	 does nothing useful, other than report the amount of FreeRTOS heap that
-	 remains unallocated. */
-	xFreeStackSpace = xPortGetFreeHeapSize();
-
-	if (xFreeStackSpace > 100) {
-		/* By now, the kernel has allocated everything it is going to, so
-		 if there is a lot of heap remaining unallocated then
-		 the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
-		 reduced accordingly. */
-	}
+	__NOP();
 }
 /*-----------------------------------------------------------*/
 
 void vApplicationDaemonTaskStartupHook( void )
 {
-	/* This function will be called once only, when the daemon task starts to
-	execute	(sometimes called the timer task).  This is useful if the
-	application includes initialisation code that would benefit from executing
-	after the scheduler has been started. */
+	// Template
 }
 
 
@@ -192,14 +155,23 @@ static void prvSetupHardware(void) {
 	 if using a ARM Cortex-M microcontroller. */
 	NVIC_SetPriorityGrouping(3);
 
+	// Enable clocks for all GPIO
 	boardGPIOConfig();
+	// Configure clock source(s) and start up PLL, configure flash access mode
 	boardRCCClockInit();
+	// Setup systick (for RTOS)(
 	boardSysTickInit(configTICK_RATE_HZ);
+	// USART for debug / telemetry configuration
 	messageInit();
+	// EEPROM and battery powered backup memory initialization
 	configInit();
+	// Initialize analog sources
 	analogInit();
+	// Initialize cyclic time based functions
 	timingInit();
+	// Initialize piezo buzzer
 	soundInit();
+	// Initialize user notification queuing
 	notifyInit();
 }
 
