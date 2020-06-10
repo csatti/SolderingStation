@@ -33,7 +33,6 @@ static void gwinLabelDrawPM(GWidgetObject *gw, justify_t justify) {
 	coord_t				w, h;
 	color_t				c;
 	GDisplay* 			pixmap;
-	pixel_t* 			surface;
 
 	w = (gw->g.flags & GLABEL_FLG_WAUTO) ? getwidth(gw->text, gw->g.font, gdispGGetWidth(gw->g.display) - gw->g.x) : gw->g.width;
 	h = (gw->g.flags & GLABEL_FLG_HAUTO) ? getheight(gw->text, gw->g.font, gdispGGetWidth(gw->g.display) - gw->g.x) : gw->g.height;
@@ -56,8 +55,6 @@ static void gwinLabelDrawPM(GWidgetObject *gw, justify_t justify) {
 	// Create a pixmap and get a pointer to the bits
 	pixmap = gdispPixmapCreate(w, h);
 	gdispGSetOrientation(pixmap, GDISP_ROTATE_0);    // default orientation
-	surface = gdispPixmapGetBits(pixmap);
-
 
 	#if GWIN_LABEL_ATTRIBUTE
 		if (gw2obj->attr) {
@@ -73,8 +70,6 @@ static void gwinLabelDrawPM(GWidgetObject *gw, justify_t justify) {
 	if (gw->g.flags & GLABEL_FLG_BORDER)
 		gdispGDrawBox(pixmap, 0, 0, w, h, (gw->g.flags & GWIN_FLG_SYSENABLED) ? gw->pstyle->enabled.edge : gw->pstyle->disabled.edge);
 
-	/*gdispBlitArea(gw->g.x, gw->g.y, w, h, surface);
-	gdispPixmapDelete(pixmap);*/
 	doubleBufferBlitArea(pixmap, gw->g.x, gw->g.y, w, h);
 }
 
@@ -118,7 +113,6 @@ void gwinProgressbarDrawPM(GWidgetObject *gw, void *param) {
 
 	const GColorSet *	pcol;
 	GDisplay* 			pixmap;
-	pixel_t* 			surface;
 
 	(void)				param;
 
@@ -131,7 +125,6 @@ void gwinProgressbarDrawPM(GWidgetObject *gw, void *param) {
 	// Create a pixmap and get a pointer to the bits
 	pixmap = gdispPixmapCreate(gw->g.width, gw->g.height);
 	gdispGSetOrientation(pixmap, GDISP_ROTATE_0);    // default orientation
-	surface = gdispPixmapGetBits(pixmap);
 
 	// Vertical progressbar
 	if (gw->g.width < gw->g.height) {
@@ -153,8 +146,6 @@ void gwinProgressbarDrawPM(GWidgetObject *gw, void *param) {
 	}
 	gdispGDrawStringBox(pixmap, 1, 1, gw->g.width-2, gw->g.height-2, gw->text, gw->g.font, pcol->text, justifyCenter);
 
-	/*gdispBlitArea(gw->g.x, gw->g.y, gw->g.width, gw->g.height, surface);
-	gdispPixmapDelete(pixmap);*/
 	doubleBufferBlitArea(pixmap, gw->g.x, gw->g.y, gw->g.width, gw->g.height);
 
 	#undef gsw
@@ -198,9 +189,6 @@ void gwinProgressbarDrawPowerBarPM(GWidgetObject *gw, void *param) {
 		if (i) gdispGDrawLine(pixmap, 9 + offs - offsa, 20, 9 + offs - offsa, gw->g.height - 10, gcol);
 	}
 
-
-	/*gdispBlitArea(gw->g.x, gw->g.y, gw->g.width, gw->g.height, surface);
-	gdispPixmapDelete(pixmap);*/
 	doubleBufferBlitArea(pixmap, gw->g.x, gw->g.y, gw->g.width, gw->g.height);
 
 	#undef gsw
@@ -227,7 +215,6 @@ void scopeDrawPM(GWidgetObject* gw, void* param)
 	uint8_t* voltage = (uint8_t*)pu8VoltageScope;
 	uint8_t* current = (uint8_t*)pu8CurrentScope;
 	GDisplay* 			pixmap;
-	pixel_t* 			surface;
 
 	(void)param;
 
@@ -245,7 +232,6 @@ void scopeDrawPM(GWidgetObject* gw, void* param)
 		// Create a pixmap and get a pointer to the bits
 		pixmap = gdispPixmapCreate(wr, h);
 		gdispGSetOrientation(pixmap, GDISP_ROTATE_0);    // default orientation
-		surface = gdispPixmapGetBits(pixmap);
 		gdispGFillArea(pixmap, 0, 0, wr, h, bgcol);
 		gdispGDrawLine(pixmap, 0, h - 1, wr - 1, h - 1, gcol);
 		// 20 V, 10 A (approx)
@@ -269,8 +255,6 @@ void scopeDrawPM(GWidgetObject* gw, void* param)
 				wp++;
 			}
 		}
-		/*gdispBlitArea(gw->g.x + i, gw->g.y, wr, h, surface);
-		gdispPixmapDelete(pixmap);*/
 
 		doubleBufferBlitArea(pixmap, gw->g.x + i, gw->g.y, wr, h);
 	}
@@ -287,7 +271,6 @@ void scopeLegendDrawPM(GWidgetObject* gw, void* param)
 	color_t	icol = HTML2COLOR(0xF03030);
 	coord_t	w, h;
 	GDisplay* 			pixmap;
-	pixel_t* 			surface;
 
 	(void)param;
 
@@ -297,18 +280,13 @@ void scopeLegendDrawPM(GWidgetObject* gw, void* param)
 	// Create a pixmap and get a pointer to the bits
 	pixmap = gdispPixmapCreate(w, h);
 	gdispGSetOrientation(pixmap, GDISP_ROTATE_0);    // default orientation
-	surface = gdispPixmapGetBits(pixmap);
 
 	gdispGFillArea(pixmap, 0, 0, w, h, bgcol);
 	gdispGDrawLine(pixmap, w-1, 0, w - 1, h - 1, gcol);
-	gdispGDrawStringBox(pixmap, 1, h - 68, gw->g.width-4, 16, "20 V", gw->g.font, vcol, justifyRight);
-	gdispGDrawStringBox(pixmap, 1, h - 51, gw->g.width-4, 16, "10 A", gw->g.font, icol, justifyRight);
-	gdispGDrawStringBox(pixmap, 1, h - 118, gw->g.width-4, 16, "40 V", gw->g.font, vcol, justifyRight);
-	gdispGDrawStringBox(pixmap, 1, h - 101, gw->g.width-4, 16, "20 A", gw->g.font, icol, justifyRight);
-
-
-	/*gdispBlitArea(gw->g.x, gw->g.y, w, h, surface);
-	gdispPixmapDelete(pixmap);*/
+	gdispGDrawStringBox(pixmap, 1, h - 68, gw->g.width - 4, 16, "20 V", gw->g.font, vcol, justifyRight);
+	gdispGDrawStringBox(pixmap, 1, h - 51, gw->g.width - 4, 16, "10 A", gw->g.font, icol, justifyRight);
+	gdispGDrawStringBox(pixmap, 1, h - 118, gw->g.width - 4, 16, "40 V", gw->g.font, vcol, justifyRight);
+	gdispGDrawStringBox(pixmap, 1, h - 101, gw->g.width - 4, 16, "20 A", gw->g.font, icol, justifyRight);
 
 	doubleBufferBlitArea(pixmap, gw->g.x, gw->g.y, w, h);
 }

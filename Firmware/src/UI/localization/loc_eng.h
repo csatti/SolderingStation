@@ -43,7 +43,7 @@
 #define ENG_TEXT00004 "Enabled"
 #define ENG_TEXT00005 "Disabled"
 #define ENG_TEXT00006 "Soldering Station"
-#define ENG_TEXT00007 "©2019 Attila Kovács"
+#define ENG_TEXT00007 "©2020 Attila Kovács"
 #define ENG_TEXT00008 "24 VAC rail:"
 #define ENG_TEXT00009 "Thermal throttle:"
 #define ENG_TEXT00010 "ADC temperature:"
@@ -75,6 +75,8 @@
 #define ENG_TEXT00106 "W"
 #define ENG_TEXT00107 "mV"
 #define ENG_TEXT00108 "."		// Decimal point
+#define ENG_TEXT00109 "°C/min."
+#define ENG_TEXT00110 "°F/min."
 
 // Menu controls
 #define ENG_TEXT00201 "Back"
@@ -160,6 +162,8 @@
 #define ENG_TEXT03082 "Delay time for screen backlight switch off"
 #define ENG_TEXT03091 "Output power limit:"
 #define ENG_TEXT03092 "The soldering station limits its output power at this value"
+#define ENG_TEXT03101 "Temperature drop rate:"
+#define ENG_TEXT03102 "Drop down rate to sleep temperature"
 
 // Iron calibration
 #define ENG_TEXT04001 "First calibration point:"

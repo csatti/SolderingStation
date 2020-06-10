@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2020, Attila KovÃ¡cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,21 +62,24 @@ typedef enum
 
 typedef volatile struct
 {
-	uint16_t 		toolPrevTempInt;    	// 0.1 °F,	Store pervious temperature (internal use only)
+	uint16_t 		toolPrevTempInt;    	// 0.1 Â°F,	Store pervious temperature (internal use only)
 	uint16_t 		toolPulse;				//			Current heating pulse number
 	uint8_t			tempReached;			//			Setpoint temperature reached (internal use only)
 	uint8_t			overTemp;				//			Overtemperature counter (internal use only)
+	uint8_t			tempValid;				//			Temperature valid counter (internal use only)
 	uint16_t		holderRaw;
 	uint16_t		ironIDRaw;
 	uint16_t		toolChangeRaw;
 	uint16_t		maxRailPowerForTool;
-	TimerHandle_t	timer;
+	uint16_t 		setpointSleepTempAct;	// 0.1 Â°F,	Active setpoint temperature for sleeping
+	TimerHandle_t	sleepTimer;				//			Delay switch off timer from sleep -> off
+	TimerHandle_t	tempDropTimer;			//			Temperature drop timer tick during sleep
 } ToolDataInt_t;
 
 typedef struct
 {
 	uint16_t 		toolTempRaw;			//			Raw ADC temperature value
-	uint16_t 		toolTempInt;    		// 0.1 °F	Tip temperature
+	uint16_t 		toolTempInt;    		// 0.1 Â°F	Tip temperature
 	uint8_t			throttlingOn;			//			Thermal throttling on
 
 	InputState_t	holder;					//			Tool in holder
@@ -96,15 +99,16 @@ typedef struct {
 	uint8_t			tool1;					//			Tool 1 on/off
 	uint8_t			tool2;					//			Tool 2 on/off
 	uint8_t			calibPointTool1; 		// 			0 = No calibration, 1-3 = Selected calibration point
-	uint16_t 		setpointTemp;			// 0.1 °F,	Setpoint temperature for soldering
-	uint16_t 		setpointSleepTemp;		// 0.1 °F,	Setpoint temperature for sleeping
+	uint16_t 		setpointTemp;			// 0.1 Â°F,	Setpoint temperature for soldering
+	uint16_t 		setpointSleepTemp;		// 0.1 Â°F,	Setpoint temperature for sleeping
 	uint16_t		delayOff;				// min,		Maximum sleep time, auto off afterwards
 	uint16_t 		powerLimit;				// W,		Limit maximum output power
+	uint16_t		dropTemp;				// s/1.8 Â°F,	Temperature drop rate during sleep mode
 } Control_t;
 
 typedef struct {
-	uint16_t 		ambientTempInt;  		// 0.1 °F, 	Ambient temperature measured at front panel PCB
-	uint16_t		startTempInt;			// 0.1 °F, 	Ambient temperature during switch on
+	uint16_t 		ambientTempInt;  		// 0.1 Â°F, 	Ambient temperature measured at front panel PCB
+	uint16_t		startTempInt;			// 0.1 Â°F, 	Ambient temperature during switch on
 	uint16_t 		refVoltageRaw;	 		// 			Reference voltage (offset voltage for thermocouple gain amp)
 	uint16_t 		supplyVoltage;	 		// mV, 		MCU supply voltage
 	uint16_t		railVoltage; 	 		// 0.1 V,	24VAC RMS voltage (filtered)

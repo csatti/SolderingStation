@@ -55,6 +55,9 @@
 																// Calibration ADC values (above reference offset) for calibrating C210
 #endif
 
+// Counters
+#define VALUE_GOOD						6						// Counter limit for valid value check
+
 // Temperature limits
 #define TEMP_ZERO						320						// in 0.1 °F   (0 °C)
 #define TEMP_COLD						1220					// in 0.1 °F   (50 °C)

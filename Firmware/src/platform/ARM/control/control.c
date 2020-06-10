@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2020, Attila KovÃ¡cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -217,7 +217,7 @@ static void _measureCommonInputs(void)
 
 }
 
-// Raw ADC tip temperature conversion to internal temperature format (0.1 °F)
+// Raw ADC tip temperature conversion to internal temperature format (0.1 Â°F)
 static uint16_t convertRawTempToInternal(uint16_t rawTemp, const uint16_t* calibPoints, ADCtoTemp_t* calib)
 {
 	int32_t calibDiff, tempDiff, ratio, temp;
@@ -282,21 +282,28 @@ static void _calculateState(volatile ToolData_t* tool, uint8_t* controlOn, uint8
 		tool->toolType = TOOL_NOTYPE;
 		// Reset measured top power output for tip as it is no longer present
 		tool->internal->maxRailPowerForTool = 0;
+		// Reset temperature valid counter
+		tool->internal->tempValid = 0;
 	} else {
-		switch (tool->ironID) {
-		// If ironID present, cartridge type is C210
-		case INPUT_ON:
-			tool->toolType = TOOL_T210;
-			calibPoints = CalibPointsT210;
-			calib = &(CalibOffline->toolT210);
-			break;
-		// If ironID not present, cartridge type is C245
-		case INPUT_OFF:
-			tool->toolType = TOOL_T245;
-			calibPoints = CalibPointsT245;
-			calib = &(CalibOffline->toolT245);
-			break;
-		default:;
+		if (tool->toolType == TOOL_NOTYPE) {
+			tool->internal->tempValid++;
+		}
+		if (tool->internal->tempValid >= VALUE_GOOD) {
+			switch (tool->ironID) {
+				// If ironID present, cartridge type is C210
+				case INPUT_ON:
+					tool->toolType = TOOL_T210;
+					calibPoints = CalibPointsT210;
+					calib = &(CalibOffline->toolT210);
+					break;
+				// If ironID not present, cartridge type is C245
+				case INPUT_OFF:
+					tool->toolType = TOOL_T245;
+					calibPoints = CalibPointsT245;
+					calib = &(CalibOffline->toolT245);
+					break;
+				default:;
+			}
 		}
 	}
 
@@ -308,7 +315,7 @@ static void _calculateState(volatile ToolData_t* tool, uint8_t* controlOn, uint8
 		// Overtemperature detection
 		if ((tool->toolTempInt >= TIPTEMP_LIMIT) && (_u8EnableStation)) {
 			tool->internal->overTemp++;
-			if (tool->internal->overTemp > 4) {
+			if (tool->internal->overTemp >= VALUE_GOOD) {
 				// Disable station
 				_u8EnableStation = 0;
 				// Send alarm to user
@@ -343,17 +350,29 @@ static void _calculateState(volatile ToolData_t* tool, uint8_t* controlOn, uint8
 			tool->toolState = TOOL_SLEEP;
 
 			// If sleep timer is not running, start it
-			if (xTimerIsTimerActive(tool->internal->timer) == pdFALSE) {
-				uint32_t period = (_internalData.control.delayOff * 60 * 1000) / portTICK_PERIOD_MS;
+			if (xTimerIsTimerActive(tool->internal->sleepTimer) == pdFALSE) {
+				tool->internal->setpointSleepTempAct = tool->toolTempInt;
+				if (tool->internal->setpointSleepTempAct > _internalData.control.setpointTemp) tool->internal->setpointSleepTempAct = _internalData.control.setpointTemp;
+				if (tool->internal->setpointSleepTempAct < _internalData.control.setpointSleepTemp) tool->internal->setpointSleepTempAct = _internalData.control.setpointSleepTemp;
 
-				xTimerChangePeriod(tool->internal->timer, period, 0);
-				xTimerStart(tool->internal->timer, 0);
+				uint32_t period = ((uint32_t)_internalData.control.delayOff * 60 * 1000) / portTICK_PERIOD_MS;
+
+				xTimerChangePeriod(tool->internal->sleepTimer, period, 0);
+				xTimerStart(tool->internal->sleepTimer, 0);
+
+				period = ((uint32_t)_internalData.control.dropTemp * 10) / portTICK_PERIOD_MS;
+				xTimerChangePeriod(tool->internal->tempDropTimer, period, 0);
+				xTimerStart(tool->internal->tempDropTimer, 0);
 			}
 		} else {
 
 			// If sleep timer is running, stop it
-			if (xTimerIsTimerActive(tool->internal->timer) == pdTRUE)
-				xTimerStop(tool->internal->timer, 0);
+			if (xTimerIsTimerActive(tool->internal->sleepTimer) == pdTRUE)
+				xTimerStop(tool->internal->sleepTimer, 0);
+
+			// If temperature drop timer is running, stop it
+			if (xTimerIsTimerActive(tool->internal->tempDropTimer) == pdTRUE)
+				xTimerStop(tool->internal->tempDropTimer, 0);
 
 			if (tool->toolChange == INPUT_ON) {
 				// Tool change detected
@@ -403,6 +422,7 @@ static void _synchornizeData(void)
 		_internalData.control.setpointTemp = _externalData.control.setpointTemp;
 		_internalData.control.setpointSleepTemp = _externalData.control.setpointSleepTemp;
 		_internalData.control.delayOff = _externalData.control.delayOff;
+		_internalData.control.dropTemp = _externalData.control.dropTemp;
 		_internalData.control.powerLimit = _externalData.control.powerLimit;
 
 		// State signals
@@ -471,7 +491,7 @@ static uint16_t _controlTool(volatile ToolData_t* tool)
 	}
 
 	// Determine target temperature (normal or sleep)
-	target = (tool->toolState != TOOL_SLEEP ? _internalData.control.setpointTemp : _internalData.control.setpointSleepTemp);
+	target = (tool->toolState != TOOL_SLEEP ? _internalData.control.setpointTemp : tool->internal->setpointSleepTempAct);
 
 	// If temperature is above setpoint, no heating required
 	if (tool->toolTempInt >= target) {
@@ -497,12 +517,15 @@ static uint16_t _controlTool(volatile ToolData_t* tool)
 	maxPulse = (tempDiff > 180 ? PULSE_MAX : PULSE_MAX_DIFF_10K);  // 180 => 10 Kelvin
 	// If filtered power output reaches nominal value, stop heating
 	maxPulse = (_internalData.state.railPower > (_internalData.control.powerLimit * 10) ? 0 : maxPulse);
-
+	
 	if (tool->internal->maxRailPowerForTool > _internalData.state.railPower) {
 		uint16_t maxPulseBeforeOver = (AVERAGING_SAMPLENUM * ((_internalData.control.powerLimit * 10) - _internalData.state.railPower)) / (tool->internal->maxRailPowerForTool - _internalData.state.railPower);
 		if (maxPulse > maxPulseBeforeOver) maxPulse = maxPulseBeforeOver;
 		if ((maxPulse < PULSE_MIN) && (maxPulse)) maxPulse = PULSE_MIN;
 	}
+
+	// Limit maximum pulse in sleep mode
+	if (tool->toolState == TOOL_SLEEP) maxPulse = PULSE_MIN;
 
 	// Increase previous heating cycle number by two
 	tool->internal->toolPulse += 2;
@@ -520,7 +543,7 @@ static uint16_t _controlTool(volatile ToolData_t* tool)
 	return tool->internal->toolPulse;
 }
 
-// Convert internal temperature value (0.1 °F) for telemetry use (0.1 °C)
+// Convert internal temperature value (0.1 Â°F) for telemetry use (0.1 Â°C)
 static uint16_t _internalTempToTelemetry(uint16_t intTemp)
 {
 	int32_t conv = (int32_t)intTemp;
@@ -846,6 +869,29 @@ void controlReturnDataExchange(void)
 	xSemaphoreGive(_shMutexMeasurements);
 }
 
+// Drop sleeping temperature
+static void _tempDropTimerCallback(TimerHandle_t xTimer)
+{
+	uint32_t id = (uint32_t)pvTimerGetTimerID(xTimer);
+	switch (id) {
+		case 1:
+			_internalData.internal.tool1.setpointSleepTempAct -= 18;
+			if (_internalData.internal.tool1.setpointSleepTempAct <= _internalData.control.setpointSleepTemp) {
+				_internalData.internal.tool1.setpointSleepTempAct = _internalData.control.setpointSleepTemp;
+				xTimerStop(xTimer, 0);
+			}
+			break;
+		case 2:
+			_internalData.internal.tool2.setpointSleepTempAct -= 18;
+			if (_internalData.internal.tool2.setpointSleepTempAct <= _internalData.control.setpointSleepTemp) {
+				_internalData.internal.tool2.setpointSleepTempAct = _internalData.control.setpointSleepTemp;
+				xTimerStop(xTimer, 0);
+			}
+			break;
+		default:;
+	}
+}
+
 // Sleep timer callback
 static void _sleepTimerCallback(TimerHandle_t xTimer)
 {
@@ -888,6 +934,7 @@ void controlInit(void)
 	_internalData.control.tool2 = 0;
 	_internalData.control.calibPointTool1 = 0;
 	_internalData.control.delayOff = 1;
+	_internalData.control.dropTemp = 10;
 
 	_internalData.state.tool1.holder = INPUT_OFF;
 	_internalData.state.tool1.ironID = INPUT_OFF;
@@ -907,6 +954,7 @@ void controlInit(void)
 	_internalData.internal.tool1.toolPulse = 0;
 	_internalData.internal.tool1.tempReached = 0;
 	_internalData.internal.tool1.overTemp = 0;
+	_internalData.internal.tool1.tempValid = 0;
 	_internalData.internal.tool1.maxRailPowerForTool = 0;
 	memcpy((void*) &_internalData.internal.tool2, (void*) &_internalData.internal.tool1, sizeof(_internalData.internal.tool1));
 
@@ -918,8 +966,13 @@ void controlInit(void)
 	_internalData.state.railPower = 0;
 	_internalData.state.startTempInt = 0;
 
-	_internalData.internal.tool1.timer = xTimerCreate( TXT("Tool1Timer"), 1, pdFALSE, (void *) 1, _sleepTimerCallback);
-	_internalData.internal.tool2.timer = xTimerCreate( TXT("Tool2Timer"), 1, pdFALSE, (void *) 2, _sleepTimerCallback);
+	// Create timers for sleep mode switch off
+	_internalData.internal.tool1.sleepTimer = xTimerCreate( TXT("Tool1OffTimer"), 1, pdFALSE, (void *) 1, _sleepTimerCallback);
+	_internalData.internal.tool2.sleepTimer = xTimerCreate( TXT("Tool2OffTimer"), 1, pdFALSE, (void *) 2, _sleepTimerCallback);
+
+	// Create timers for slow temperature dropping during sleep mode
+	_internalData.internal.tool1.tempDropTimer = xTimerCreate( TXT("Tool1TempTimer"), 1, pdTRUE, (void *) 1, _tempDropTimerCallback);
+	_internalData.internal.tool2.tempDropTimer = xTimerCreate( TXT("Tool2TempTimer"), 1, pdTRUE, (void *) 2, _tempDropTimerCallback);
 
 	// Copy initialized data from internal to external data structure
 	memcpy((void*) &_externalData.control, (void*) &_internalData.control, sizeof(Control_t));

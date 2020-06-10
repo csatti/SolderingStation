@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2019, Attila Kovï¿½cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 #include "gui_priv.h"
 
-#define MAX_PARAM_NUM			10
+#define MAX_PARAM_NUM			11
 #define MAX_PARAM_LENGTH		15
 
 // Parameter I/O
@@ -123,19 +123,26 @@ static void _setSettingText(int textid)
 }
 
 static uint16_t _fillValueTable(char values[][MAX_PARAM_LENGTH],
-		const uint16_t *table, uint16_t *valNum, uint16_t currentVal, int unit)
+		const uint16_t *table, uint16_t *valNum, uint16_t currentVal, int unit, bool_t offset)
 {
 	uint16_t index = 0;
 	const char* unitText;
 
-	if (unit) {
+	if ((unit != UNITTEXT_CELSIUSPERMINUTE) && (unit != 0)) {
 		unitText = GT(unit);
 	} else {
 		ConfigOnline_t* ConfigOnline = configGetConfigOnlineNoWrite();
-
-		unitText = (
-				ConfigOnline->tempUnitC ?
-						GT(UNITTEXT_CELSIUS) : GT(UNITTEXT_FAHRENHEIT));
+		if (unit == 0) {
+			unitText = (
+					ConfigOnline->tempUnitC ?
+							GT(UNITTEXT_CELSIUS) : GT(UNITTEXT_FAHRENHEIT));
+		} else {
+			unitText = (
+					ConfigOnline->tempUnitC ?
+							GT(UNITTEXT_CELSIUSPERMINUTE) : GT(UNITTEXT_FAHRENHEITPERMINUTE));
+			unit = 0;
+		}
+		if (!ConfigOnline->tempUnitC) offset = FALSE;
 	}
 
 	if (*valNum > MAX_PARAM_NUM)
@@ -149,7 +156,9 @@ static uint16_t _fillValueTable(char values[][MAX_PARAM_LENGTH],
 		if (unit) {
 			ltoa(*table++, values[i], 10);
 		} else {
-			ltoa(guiInternalToDisplay(*table++), values[i], 10);
+			uint16_t val = *table++;
+			if (offset) val += 320;
+			ltoa(guiInternalToDisplay(val), values[i], 10);
 		}
 
 		strcat(values[i], " ");
@@ -211,40 +220,45 @@ Menu_t guiMenuSettings(void)
 			case SLEEP_TEMPERATURE:
 				valNum = SleepTempTableSize;
 				valIndex = _fillValueTable(values, SleepTempTable, &valNum,
-						ConfigOffline->sleepTemp, 0);
+						ConfigOffline->sleepTemp, 0, FALSE);
 				_setSettingText(SETTINGTEXT_SLEEPTEMP);
 				break;
 			case DELAY_SCREENOFF:
 				valNum = ScreenOffTableSize;
 				valIndex = _fillValueTable(values, ScreenOffTable, &valNum,
-						ConfigOffline->screenOff, UNITTEXT_MINUTE);
+						ConfigOffline->screenOff, UNITTEXT_MINUTE, FALSE);
 				_setSettingText(SETTINGTEXT_SCREENOFF);
 				break;
 			case DELAY_SWITCHOFF:
 				valNum = DelayOffTableSize;
 				valIndex = _fillValueTable(values, DelayOffTable, &valNum,
-						ConfigOffline->delayOff, UNITTEXT_MINUTE);
+						ConfigOffline->delayOff, UNITTEXT_MINUTE, FALSE);
 				_setSettingText(SETTINGTEXT_DELAYSWITCHOFF);
 				break;
+			case TEMPERATURE_DROP:
+				valNum = TempDropTableSize;
+				valIndex = _fillValueTable(values, TempDropTable, &valNum,
+						ConfigOffline->tempDrop, UNITTEXT_CELSIUSPERMINUTE, TRUE);
+				_setSettingText(SETTINGTEXT_TEMPERATUREDROP);
+				break;
 			case TEMPERATURE_STEP:
-				valNum = TempStepTableSize;
 				ConfigOnline = configGetConfigOnlineNoWrite();
-				unit = (ConfigOnline->tempUnitC ?
-						UNITTEXT_CELSIUS : UNITTEXT_FAHRENHEIT);
+				unit = (ConfigOnline->tempUnitC ? UNITTEXT_CELSIUS : UNITTEXT_FAHRENHEIT);
+				valNum = TempStepTableSize;
 				valIndex = _fillValueTable(values, TempStepTable, &valNum,
-						ConfigOffline->tempStep, unit);
+						ConfigOffline->tempStep, unit, FALSE);
 				_setSettingText(SETTINGTEXT_TEMPERATURESTEP);
 				break;
 			case MAX_TEMP:
 				valNum = MaxTempTableSize;
 				valIndex = _fillValueTable(values, MaxTempTable, &valNum,
-						ConfigOffline->maxTemp, 0);
+						ConfigOffline->maxTemp, 0, FALSE);
 				_setSettingText(SETTINGTEXT_MAXTEMPERATURE);
 				break;
 			case POWER_LIMIT:
 				valNum = PowerLimitTableSize;
 				valIndex = _fillValueTable(values, PowerLimitTable, &valNum,
-						ConfigOffline->powerLimit, UNITTEXT_WATT);
+						ConfigOffline->powerLimit, UNITTEXT_WATT, FALSE);
 				_setSettingText(SETTINGTEXT_POWERLIMIT);
 				break;
 			}
@@ -320,6 +334,9 @@ Menu_t guiMenuSettings(void)
 						break;
 					case DELAY_SWITCHOFF:
 						ConfigOffline->delayOff = DelayOffTable[valIndex];
+						break;
+					case TEMPERATURE_DROP:
+						ConfigOffline->tempDrop = TempDropTable[valIndex];
 						break;
 					case TEMPERATURE_STEP:
 						ConfigOffline->tempStep = TempStepTable[valIndex];

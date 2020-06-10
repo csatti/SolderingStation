@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2019, Attila Kovï¿½cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -145,10 +145,10 @@ void configInit(void)
 
 static void _resetConfigOnline(void)
 {
-	configOnline->presetTemp1 = 4640;	// 240 °C, 464 °F
-	configOnline->presetTemp2 = 5720;	// 300 °C, 572 °F
-	configOnline->presetTemp3 = 6620;	// 350 °C, 662 °F
-	configOnline->setpointTemp = 4640;	// 240 °C, 464 °F
+	configOnline->presetTemp1 = 4640;	// 240 ï¿½C, 464 ï¿½F
+	configOnline->presetTemp2 = 5720;	// 300 ï¿½C, 572 ï¿½F
+	configOnline->presetTemp3 = 6620;	// 350 ï¿½C, 662 ï¿½F
+	configOnline->setpointTemp = 4640;	// 240 ï¿½C, 464 ï¿½F
 	configOnline->language = 0;
 	configOnline->sound = 1;
 	configOnline->tempUnitC = 1;
@@ -164,6 +164,7 @@ static void _resetConfigOffline(void)
 	configOffline.delayOff = DelayOffTable[4];
 	configOffline.tempStep = TempStepTable[3];
 	configOffline.maxTemp = MaxTempTable[1];
+	configOffline.tempDrop = TempDropTable[2];
 	configOffline.screenOff = ScreenOffTable[3];
 	configOffline.powerLimit = PowerLimitTable[6];
 	configOffline.canary = CONFIGOFFLINE_CANARY;

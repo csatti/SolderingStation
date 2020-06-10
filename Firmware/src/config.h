@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2019, Attila KovÃ¡cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,15 +32,15 @@
 #include "ILI9341.h"
 #include "board.h"
 
-// I really don't like to calculate in Fahrenheit, but it is easier to convert from °F to °C without going to
+// I really don't like to calculate in Fahrenheit, but it is easier to convert from Â°F to Â°C without going to
 // fraction hell
 
 // Data is stored in 32bit wide registers (bitfield and volatile), max 80 bytes
 typedef struct  {
-	volatile uint32_t presetTemp1  		: 16;	// in 0.1 °F
-	volatile uint32_t presetTemp2  		: 16;	// in 0.1 °F
-	volatile uint32_t presetTemp3  		: 16;	// in 0.1 °F
-	volatile uint32_t setpointTemp 		: 16;	// in 0.1 °F
+	volatile uint32_t presetTemp1  		: 16;	// in 0.1 Â°F
+	volatile uint32_t presetTemp2  		: 16;	// in 0.1 Â°F
+	volatile uint32_t presetTemp3  		: 16;	// in 0.1 Â°F
+	volatile uint32_t setpointTemp 		: 16;	// in 0.1 Â°F
 	volatile uint32_t language	   		: 16;
 	volatile uint32_t sound				: 16;
 	volatile uint32_t tempUnitC			: 16;
@@ -58,7 +58,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t		calibrated;
-	uint16_t 	calibrationPointTemp[3];	// in 0.1 °F	(without cold junction temperature)
+	uint16_t 	calibrationPointTemp[3];	// in 0.1 Â°F	(without cold junction temperature)
 } ADCtoTemp_t;
 
 // Offline data is stored in 2kB EEPROM (read at start up, written by request)
@@ -74,8 +74,8 @@ static const uint16_t CalibPointsT245[] = { CALIB_T245 };
 static const uint16_t CalibPointsT210[] = { CALIB_T210 };
 
 static const uint16_t SleepTempTableSize = 5;
-static const uint16_t SleepTempTable[] = { 1760, 2120, 2480, 3020, 3380};  // in 0.1 °F
-//										   80,   100,  120,  150,  170     °C
+static const uint16_t SleepTempTable[] = { 1760, 2120, 2480, 3020, 3380};  // in 0.1 Â°F
+//										   80,   100,  120,  150,  170     Â°C
 
 static const uint16_t DelayOffTableSize = 7;
 static const uint16_t DelayOffTable[] = { 1, 2, 5, 10, 15, 30, 60}; // in minutes
@@ -86,15 +86,20 @@ static const uint16_t PowerLimitTable[] = { 25, 50, 75, 100, 125, 150, 160, 180}
 static const uint16_t ScreenOffTableSize = 5;
 static const uint16_t ScreenOffTable[] = { 5, 15, 30, 60, 120}; // in minutes
 
+static const uint16_t TempDropTableSize = 7;
+static const uint16_t TempDropTable[] = { 90, 180, 360, 540, 810, 1080, 1620}; // in 0.1 Â°F / minute
+//										  5,   10,  20,  30,  45,   60,   90		     Â°C / minute
+
 static const uint16_t TempStepTableSize = 5;
 static const uint16_t TempStepTable[] = { 1, 2, 5, 10, 20};  // step unit is same as selected temperature unit
 
 static const uint16_t MaxTempTableSize = 4;
-static const uint16_t MaxTempTable[] = { 5720, 6620, 7520, 8420};   // in 0.1 °F
-//										 300,  350,  400,  450		°C
+static const uint16_t MaxTempTable[] = { 5720, 6620, 7520, 8420};   // in 0.1 Â°F
+//										 300,  350,  400,  450		Â°C
 
 typedef enum {
 	SLEEP_TEMPERATURE,
+	TEMPERATURE_DROP,
 	MAX_TEMP,
 	TEMPERATURE_STEP,
 	DELAY_SWITCHOFF,
@@ -112,6 +117,7 @@ typedef struct  {
 	uint16_t delayOff;
 	uint16_t tempStep;
 	uint16_t maxTemp;
+	uint16_t tempDrop;
 	uint16_t screenOff;
 	uint16_t powerLimit;
 	uint32_t canary;

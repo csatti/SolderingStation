@@ -43,7 +43,7 @@
 #define HUN_TEXT00004 "Engedélyezve"
 #define HUN_TEXT00005 "Letiltva"
 #define HUN_TEXT00006 "Forrasztó állomás"
-#define HUN_TEXT00007 "©2019 Kovács Attila"
+#define HUN_TEXT00007 "©2020 Kovács Attila"
 #define HUN_TEXT00008 "24VAC sín:"
 #define HUN_TEXT00009 "Hő határolás:"
 #define HUN_TEXT00010 "ADC hőmérséklet:"
@@ -75,6 +75,8 @@
 #define HUN_TEXT00106 "W"
 #define HUN_TEXT00107 "mV"
 #define HUN_TEXT00108 ","		// Decimal point
+#define HUN_TEXT00109 "°C/perc"
+#define HUN_TEXT00110 "°F/perc"
 
 // Menu controls
 #define HUN_TEXT00201 "Vissza"
@@ -160,6 +162,8 @@
 #define HUN_TEXT03082 "Képernyő háttérvilágításának kikapcsolása ha nincs aktivitás"
 #define HUN_TEXT03091 "Teljesítmény korlátozás:"
 #define HUN_TEXT03092 "A forrasztópáka korlátozza a leadott átlagteljesítményt a megadott értéken"
+#define HUN_TEXT03101 "Hőmérséklet csökkentés:"
+#define HUN_TEXT03102 "Altatáskor a hőmérsékletcsökkenés sebessége"
 
 // Iron calibration
 #define HUN_TEXT04001 "Első kalibrációs pont:"

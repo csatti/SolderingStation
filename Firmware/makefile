@@ -1,5 +1,5 @@
 ## Platform
-ARM_COMPILE			= 	arm-atollic-eabi
+ARM_COMPILE			= 	arm-none-eabi
 CPU 				= 	-mcpu=cortex-m4
 FPU 				= 	-mfpu=fpv4-sp-d16
 FLOAT-ABI 			= 	-mfloat-abi=hard
@@ -85,7 +85,7 @@ ifeq ($(PLATFORM), Win32)
 	# Win32
 	PLTDIR 			=	$(PLT)/Win32
 	BUILDDIRP 		=	$(BUILDDIR)/Win32
-	CROSS_COMPILE 	=	
+	CROSS_COMPILE 	=	i686-w64-mingw32-
 	MCU 			= 
 	
 	# C includes
@@ -141,7 +141,7 @@ else
 	LDLIBS			=   $(LIB)/CMSIS/Lib/libarm_cortexM4lf_math.a
 	
 	# Build command
-	pall 			= path $(VER) $(ELF) $(HEX) #$(BIN)
+	pall 			= path $(VER) $(ELF) $(HEX) $(ISE) #$(BIN)
 endif
 
 ## External libraries (with own make)
@@ -155,20 +155,20 @@ C_SOURCES += $(GFXSRC)
 C_INC += $(GFXINC)
 
 ## Add -D to defines
-C_DEFINES =$(foreach d, $(C_DEF), -D$d)
-AS_DEFINES =$(foreach d, $(AS_DEF), -D$d)
+C_DEFINES = $(foreach d, $(C_DEF), -D$d)
+AS_DEFINES = $(foreach d, $(AS_DEF), -D$d)
 
 ## Add -I to includes
-C_INCLUDES =$(foreach d, $(C_INC), -I$d)
-AS_INCLUDES =$(foreach d, $(AS_INC), -I$d)
+C_INCLUDES = $(foreach d, $(C_INC), -I$d)
+AS_INCLUDES = $(foreach d, $(AS_INC), -I$d)
 
 ## Cross-compilation commands 
-CC = $(CROSS_COMPILE)gcc
-AS = $(CROSS_COMPILE)gcc
-LD = $(CROSS_COMPILE)gcc
-AR = $(CROSS_COMPILE)ar
-OC = $(CROSS_COMPILE)objcopy
-SZ = $(CROSS_COMPILE)size
+CC = @$(CROSS_COMPILE)gcc
+AS = @$(CROSS_COMPILE)gcc
+LD = @$(CROSS_COMPILE)gcc
+AR = @$(CROSS_COMPILE)ar
+OC = @$(CROSS_COMPILE)objcopy
+SZ = @$(CROSS_COMPILE)size
 
 ## Optimization
 ifeq ($(DEBUG), 1)
@@ -213,15 +213,41 @@ SU_FILES = $(OBJECTS:.o=.su)
 # Outputs
 VER = $(SRC)/version.h 
 ELF = $(BUILD_DIR)/$(TARGET).elf
-HEX = $(BUILD_DIR)/$(TARGET).hex
+HEX = $(BUILD_DIR)/$(TARGET)_$(VERSION)-$(BRANCH)-$(COMMITDATETIME).hex
 BIN = $(BUILD_DIR)/$(TARGET).bin
 MAP = $(BUILD_DIR)/$(TARGET).map
-EXE = $(BUILD_DIR)/$(TARGET).exe
+EXE = $(BUILD_DIR)/$(TARGET)_$(VERSION)-$(BRANCH)-$(COMMITDATETIME).exe
+ISE = .vscode/c_cpp_properties.json
 
 # Dependencies	
 -include $(DEP_FILES)
 
 all: $(pall)
+
+ISE_DEF = $(foreach d, $(C_DEF),"$d", )
+ISE_INC = $(foreach d, $(C_INC),"$${workspaceFolder}/$d/*", )
+
+# Generating VS Code intellisense file
+$(ISE):
+	@echo Generating $@
+	@echo { > $@
+	@echo 	"configurations": [ >> $@
+	@echo 		{ >> $@
+	@echo 			"name": "Debug ($(TARGET))", >> $@
+	@echo 			"compilerPath": "$${env:VSARM}/armcc/bin/arm-none-eabi-gcc", >> $@
+	@echo 			"includePath": [ >> $@
+	@echo 				$(ISE_INC) >> $@
+	@echo 				"$${workspaceFolder}" >> $@
+	@echo 			], >> $@
+	@echo 			"defines": [ >> $@
+	@echo 				$(ISE_DEF) >> $@
+	@echo 				"DEBUG=1" >> $@
+	@echo 			], >> $@
+	@echo 			"intelliSenseMode": "clang-x64" >> $@	
+	@echo 		} >> $@
+	@echo 	], >> $@
+	@echo 	"version": 4 >> $@
+	@echo } >> $@
 
 # Generating version file
 $(VER):
@@ -231,23 +257,29 @@ $(VER):
 	@echo #define VERSION 		"$(VERSION)-$(BRANCH)-$(COMMITDATETIME)" >> $@
 
 $(BUILD_DIR)/$(OBJDIR)/%.o: %.c 
+	@echo Compiling $<
 	$(CC) $< -o $@ $(CFLAGS) 
 	
 $(BUILD_DIR)/$(OBJDIR)/%.o: %.s
+	@echo Assembling $<
 	$(AS) $< -o $@ $(ASFLAGS) 
 
 $(ELF): $(OBJECTS)
+	@echo Linking $@
 	$(LD) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $@ 
 	$(SZ) $@
 
 $(EXE): $(OBJECTS)
+	@echo Linking $@
 	$(LD) $(OBJECTS) $(LDLIBS) -o $@ 
 	$(SZ) $@
 	
 $(HEX): $(ELF)
+	@echo Generating $@
 	$(OC) -O ihex $< $@
 	
 $(BIN): $(ELF)
+	@echo Generating $@
 	$(OC) -O binary -S $< $@
 
 path:
@@ -258,6 +290,6 @@ path:
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJECTS) $(DEP_FILES) $(SU_FILES) $(ELF) $(HEX) $(BIN) $(EXE) $(MAP) $(VER)
+	rm -rf $(OBJECTS) $(DEP_FILES) $(SU_FILES) $(ELF) $(HEX) $(BIN) $(EXE) $(MAP) $(VER) $(ISE)
 	
 	

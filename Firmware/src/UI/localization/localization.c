@@ -1,4 +1,4 @@
-/* Copyright (C) 2018, Attila Kovács
+/* Copyright (C) 2018, Attila Kovï¿½cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,8 @@ static const text FTXT texts[LAST_TEXT] =
 	TXT_EL(TEXT00106),
 	TXT_EL(TEXT00107),
 	TXT_EL(TEXT00108),
+	TXT_EL(TEXT00109),
+	TXT_EL(TEXT00110),
 
 // Menu controls
 	TXT_EL(TEXT00201),
@@ -170,6 +172,8 @@ static const text FTXT texts[LAST_TEXT] =
 	TXT_EL(TEXT03082),
 	TXT_EL(TEXT03091),
 	TXT_EL(TEXT03092),
+	TXT_EL(TEXT03101),
+	TXT_EL(TEXT03102),
 
 // Iron calibration
 	TXT_EL(TEXT04001),

@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 - 2019, Attila Kovács
+/* Copyright (C) 2018 - 2019, Attila Kovï¿½cs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -478,7 +478,7 @@ Menu_t guiMenuMainScreen(void)
 	ConfigOnline_t* ConfigOnline;
 	ConfigOffline_t* ConfigOffline;
 	DataExchange_t* DataExchange;
-	uint16_t tempStep, maxTemp, multiplier, diagnostics;
+	uint16_t tempStep, maxTemp, multiplier, diagnostics, tempDrop;
 	uint32_t msg;
 
 	ConfigOnline = configGetConfigOnline();
@@ -503,9 +503,11 @@ Menu_t guiMenuMainScreen(void)
 	ConfigOffline = configGetConfigOffline();
 	tempStep = ConfigOffline->tempStep * multiplier;
 	maxTemp = ConfigOffline->maxTemp;
+	tempDrop = ConfigOffline->tempDrop;
 	DataExchange->control.setpointSleepTemp = ConfigOffline->sleepTemp;
 	DataExchange->control.delayOff = ConfigOffline->delayOff;
 	DataExchange->control.powerLimit = ConfigOffline->powerLimit;
+	DataExchange->control.dropTemp = 6000 / (tempDrop / 18);
 	guiSetScreenSaver(ConfigOffline->screenOff);
 
 	controlReturnDataExchange();
@@ -621,7 +623,7 @@ Menu_t guiMenuMainScreen(void)
 				}
 
 				if (ConfigOnline->setpointTemp < 2120) {
-					ConfigOnline->setpointTemp = 2120; // 100 °C
+					ConfigOnline->setpointTemp = 2120; // 100 ï¿½C
 					_updateSetpoint(ConfigOnline);
 				}
 
