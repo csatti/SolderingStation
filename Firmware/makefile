@@ -86,6 +86,7 @@ ifeq ($(PLATFORM), Win32)
 	PLTDIR 			=	$(PLT)/Win32
 	BUILDDIRP 		=	$(BUILDDIR)/Win32
 	CROSS_COMPILE 	=	i686-w64-mingw32-
+	GET_SIZE 		=
 	MCU 			= 
 	
 	# C includes
@@ -106,6 +107,7 @@ else
 	PLTDIR 			= 	$(PLT)/ARM
 	BUILDDIRP 		= 	$(BUILDDIR)/ARM
 	CROSS_COMPILE 	=	$(ARM_COMPILE)-
+	GET_SIZE 		=	$(ARM_COMPILE)-
 	OPTDBG			+= 	-gdwarf
 	## Microcontroller
 	MCU 			= 	$(CPU) -mthumb $(FPU) $(FLOAT-ABI) -specs=nano.specs -fstack-usage
@@ -168,7 +170,7 @@ AS = @$(CROSS_COMPILE)gcc
 LD = @$(CROSS_COMPILE)gcc
 AR = @$(CROSS_COMPILE)ar
 OC = @$(CROSS_COMPILE)objcopy
-SZ = @$(CROSS_COMPILE)size
+SZ = @$(GET_SIZE)size
 
 ## Optimization
 ifeq ($(DEBUG), 1)

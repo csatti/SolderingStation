@@ -377,7 +377,7 @@ static void _calculateState(volatile ToolData_t* tool, uint8_t* controlOn, uint8
 			if (tool->toolChange == INPUT_ON) {
 				// Tool change detected
 				tool->toolState = TOOL_CHANGE;
-			} else if (tool->toolTempInt + 180 < _internalData.control.setpointTemp) {
+			} else if (tool->toolTempInt + (180 * 3) < _internalData.control.setpointTemp) {
 				// Tip is warming up
 				tool->toolState = TOOL_WARMUP;
 				tool->internal->tempReached = 0;
